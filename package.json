@@ -1,0 +1,30 @@
+{
+  "name": "d424-software-engineering-capstone",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.12.6",
+    "@apollo/server": "^4.11.3",
+    "@as-integrations/next": "^3.2.0",
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.2",
+    "express-graphql": "^0.12.0",
+    "graphql": "^16.10.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "next": "^15.1.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
+  }
+}
