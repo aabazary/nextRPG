@@ -11,19 +11,43 @@ const typeDefs = `#graphql
     class: String!
     health: Int!
     castingResource: Int!
+    level: Int!
     power: Int!
-    defense: Int!
     preparedness: Int!
+    experience: Int!
+    score: Int!
     inventory: JSON
-    armor: Armor
+    gold: Int!
+    armor: Armor!
+    progress: Progress!
+    potionBag: PotionBag!
   }
 
   type Armor {
     helmet: Int!
-    chestpiece: Int!
+    chestPiece: Int!
     leggings: Int!
     boots: Int!
     gloves: Int!
+  }
+
+  type Progress {
+    mobsKilled: Int!
+    questsCompleted: Int!
+    gatherings: Int!
+  }
+
+  type PotionBag {
+    tier1: Int!
+    tier2: Int!
+    tier3: Int!
+    tier4: Int!
+    tier5: Int!
+    tier6: Int!
+    tier7: Int!
+    tier8: Int!
+    tier9: Int!
+    tier10: Int!
   }
 
   type Auth {

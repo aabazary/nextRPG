@@ -7,7 +7,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed":"node utils/seed/seedData.js"
   },
   "dependencies": {
     "@apollo/client": "^3.12.6",
