@@ -1,6 +1,7 @@
 import User from "../../models/User.js"
 import Character from "../../models/Character.js";
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const seedData = async () => {
   await mongoose.connect('mongodb://127.0.0.1:27017/rpg-game', {
@@ -9,11 +10,9 @@ const seedData = async () => {
   });
 
   try {
-    // Clear existing data
     await User.deleteMany({});
     await Character.deleteMany({});
 
-    // Create Characters
     const characters = [
       {
         name: 'Thalador',
@@ -115,24 +114,23 @@ const seedData = async () => {
 
     const insertedCharacters = await Character.insertMany(characters);
 
-    // Create Users
     const users = [
       {
         username: 'player1',
         email: 'player1@example.com',
-        password: 'hashedpassword1', // Ensure this is hashed in real applications
+        password: await bcrypt.hash('password1', 10),
         characters: [insertedCharacters[0]._id],
       },
       {
         username: 'player2',
         email: 'player2@example.com',
-        password: 'hashedpassword2', // Ensure this is hashed in real applications
+        password: await bcrypt.hash('password2', 10),
         characters: [insertedCharacters[1]._id],
       },
       {
         username: 'player3',
         email: 'player3@example.com',
-        password: 'hashedpassword3', // Ensure this is hashed in real applications
+        password: await bcrypt.hash('password3', 10), 
         characters: [insertedCharacters[2]._id],
       },
     ];

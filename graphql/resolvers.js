@@ -3,14 +3,10 @@ import Character from "../models/Character.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// Helper function for creating JWT token
-const createToken = (user) => {
-  return jwt.sign({ id: user._id, email: user.email }, 'your-secret-key', { expiresIn: '1h' });
-};
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 const resolvers = {
   Query: {
-    // Query to get a user by ID
     getUser: async (_, { id }) => {
       try {
         return await User.findById(id).populate('characters');
@@ -19,7 +15,6 @@ const resolvers = {
       }
     },
 
-    // Query to get a character by ID
     getCharacter: async (_, { id }) => {
       try {
         return await Character.findById(id);
@@ -28,7 +23,6 @@ const resolvers = {
       }
     },
 
-    // Query to get all users
     getAllUsers: async () => {
       try {
         return await User.find().populate('characters');
@@ -37,7 +31,6 @@ const resolvers = {
       }
     },
 
-    // Query to get all characters
     getAllCharacters: async () => {
       try {
         return await Character.find();
@@ -45,37 +38,53 @@ const resolvers = {
         throw new Error('Error fetching characters');
       }
     },
+    me: async (_, __, { authHeader }) => {
+      try {
+        if (!authHeader) {
+          throw new Error('Authorization header missing');
+        }
+    
+        const token = authHeader.replace('Bearer ', '');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId).populate('characters');
+        if (!user) throw new Error('User not found');
+    
+        return user;
+      } catch (error) {
+        throw new Error(`Authentication error: ${error.message}`);
+      }
+    },
+    
   },
 
   Mutation: {
-    // Mutation for user registration
-    register: async (_, { email, password }) => {
+    signup: async (_, { email,username, password }) => {
       try {
         const existingUser = await User.findOne({ email });
         if (existingUser) throw new Error('User already exists');
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ email, password: hashedPassword });
+        const newUser = new User({ email,username, password: hashedPassword });
         await newUser.save();
 
-        return newUser;
+        const token =  jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
+
+        return {user:newUser,token};
       } catch (error) {
-        throw new Error('Error registering user');
+        throw new Error(error.message);
       }
     },
 
-    // Mutation for user login (returns a JWT token)
+
     login: async (_, { email, password }) => {
       try {
         const user = await User.findOne({ email });
         if (!user) throw new Error('User not found');
 
-        // Compare provided password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) throw new Error('Invalid credentials');
 
-        // Generate JWT token
-        const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
 
         return {
           token, 
@@ -86,14 +95,13 @@ const resolvers = {
       }
     },
 
-    // Mutation to create a new character
+
     createCharacter: async (_, { userId, name, class: characterClass }) => {
       try {
-        // Fetch the user by ID
+
         const user = await User.findById(userId);
         if (!user) throw new Error('User not found');
     
-        // Create a new character with the updated schema
         const newCharacter = new Character({
           name,
           class: characterClass,
@@ -127,14 +135,11 @@ const resolvers = {
           score: 0, 
         });
     
-        // Save the character
         await newCharacter.save();
     
-        // Associate the character with the user
         user.characters.push(newCharacter);
         await user.save();
     
-        // Return the newly created character
         return newCharacter;
       } catch (error) {
         throw new Error(`Error creating character: ${error.message}`);
@@ -142,7 +147,6 @@ const resolvers = {
     },
     
 
-    // Mutation to delete a character
     deleteCharacter: async (_, { characterId }) => {
       try {
         const character = await Character.findByIdAndDelete(characterId);
@@ -275,12 +279,10 @@ const resolvers = {
           return `The ${gearType} is already at Tier ${character.armor[gearType]} or higher. No upgrade needed.`;
         }
         
-        // Define resource keys
         const resourceAKey = `Tier${tier}ResourceA`;
         const resourceBKey = `Tier${tier}ResourceB`;
         const resourceCKey = tier > 1 ? `Tier${tier - 1}ResourceC` : null;
     
-        // Check if character has enough resources
         if (
           character.inventory[resourceAKey] < 20 ||
           character.inventory[resourceBKey] < 20 ||
@@ -288,8 +290,7 @@ const resolvers = {
         ) {
           return "Not enough resources to upgrade gear";
         }
-    
-        // Deduct resources
+
         character.inventory[resourceAKey] -= 20;
         character.inventory[resourceBKey] -= 20;
         if (resourceCKey) {
@@ -298,7 +299,6 @@ const resolvers = {
     
         character.markModified('inventory');
     
-        // Upgrade gear
         character.armor[gearType] = tier;
         character.markModified('armor');
     

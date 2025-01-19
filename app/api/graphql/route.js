@@ -4,18 +4,22 @@ import dbConnect from '../../../utils/dbConnect';
 import typeDefs from '../../../graphql/typeDefs';
 import resolvers from '../../../graphql/resolvers';
 
-// Initialize Apollo Server
+
 const server = new ApolloServer({
   typeDefs,
   resolvers
 });
 
-// Ensure MongoDB is connected before handling requests
 const handler = startServerAndCreateNextHandler(server, {
-  context: async () => {
+  context: async (req, res) => {
     await dbConnect();
-    return {}; // No custom context needed yet
+    const authHeader = req.headers.get('authorization') || null;
+    return {
+      authHeader, 
+      req,      
+    };
   },
 });
 
-export { handler as GET, handler as POST }; // Support both GET and POST requests
+
+export { handler as GET, handler as POST }; 

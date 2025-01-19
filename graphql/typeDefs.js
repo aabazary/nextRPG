@@ -1,6 +1,7 @@
 const typeDefs = `#graphql
   type User {
     id: ID!
+    username:String!
     email: String!
     characters: [Character]
   }
@@ -60,10 +61,11 @@ const typeDefs = `#graphql
     getCharacter(id: ID!): Character
     getAllUsers: [User]
     getAllCharacters: [Character]
+    me:User
   }
 
   type Mutation {
-    register(email: String!, password: String!): User
+    signup(email: String!,username:String!, password: String!): Auth!
     login(email: String!, password: String!): Auth!
     createCharacter(userId: ID!, name: String!, class: String!): Character
     deleteCharacter(characterId: ID!): String!
