@@ -3,6 +3,7 @@ const typeDefs = `#graphql
     id: ID!
     username:String!
     email: String!
+    activeCharacter: Character
     characters: [Character]
   }
 
@@ -74,6 +75,7 @@ const typeDefs = `#graphql
     completeBossBattle(characterId: ID!, tier: Int!, successful: Boolean!): String!
     purchasePotion(characterId: ID!, tier: Int!): String!
     upgradeGear(characterId: ID!, gearType: String!, tier: Int!): String!
+    setActiveCharacter(characterId:ID!):User
   }
 
   scalar JSON

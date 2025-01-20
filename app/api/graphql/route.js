@@ -3,6 +3,7 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import dbConnect from '../../../utils/dbConnect';
 import typeDefs from '../../../graphql/typeDefs';
 import resolvers from '../../../graphql/resolvers';
+import { createContext } from '@/utils/auth';
 
 
 const server = new ApolloServer({
@@ -13,11 +14,12 @@ const server = new ApolloServer({
 const handler = startServerAndCreateNextHandler(server, {
   context: async (req, res) => {
     await dbConnect();
-    const authHeader = req.headers.get('authorization') || null;
-    return {
-      authHeader, 
-      req,      
-    };
+    // const authHeader = req.headers.get('authorization') || null;
+    // return {
+    //   authHeader, 
+    //   req,      
+    // };
+    return await createContext(req);
   },
 });
 

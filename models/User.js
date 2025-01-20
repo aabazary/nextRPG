@@ -4,7 +4,8 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true },
   password: { type: String, required: true },
-  characters: [{ type: Schema.Types.ObjectId, ref: 'Character' }],
+  activeCharacter:{ type: Schema.Types.ObjectId, ref: 'Character' },
+  characters: [{ type: Schema.Types.ObjectId, ref: 'Character' }]
 });
 
 export default model('User', userSchema);

@@ -2,6 +2,7 @@ import User from "../models/User";
 import Character from "../models/Character.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import context from "@/utils/auth";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
@@ -157,6 +158,31 @@ const resolvers = {
         throw new Error('Error deleting character');
       }
     },
+    setActiveCharacter: async (_, { characterId }, context) => {
+      if (!context.user) {
+        throw new Error('Authentication required');
+      }
+    
+      const user = await User.findById(context.user._id).populate('characters');
+      if (!user) {
+        throw new Error('User not found');
+      }
+    
+      const characterExists = user.characters.some(
+        (character) => character._id.toString() === characterId
+      );
+    
+      if (!characterExists) {
+        throw new Error('Character not found in user\'s character list');
+      }
+    
+      user.activeCharacter = characterId;
+      await user.save();
+    
+      return user; 
+    },
+    
+  
     completeGatheringTask: async (_, { characterId, tier, successful }) => {
       try {
         const character = await Character.findById(characterId);
