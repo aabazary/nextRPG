@@ -1,10 +1,9 @@
-"use client"; 
+"use client";
 
 import Navbar from "../components/Navbar";
 import "./globals.css";
 import { ApolloProvider } from "@apollo/client";
 import client from "@/utils/apolloClient";
-
 
 export default function RootLayout({ children }) {
   return (

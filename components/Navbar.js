@@ -1,16 +1,16 @@
-"use client"; 
+"use client";
 
 import { useQuery } from "@apollo/client";
 import { ME_QUERY } from "@/app/api/graphql/queries";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const getAuthToken = () => {
-  const cookies = document.cookie.split(';');
+  const cookies = document.cookie.split(";");
   let token = null;
-  cookies.forEach(cookie => {
-    const [key, value] = cookie.split('=');
-    if (key.trim() === 'authToken') {
+  cookies.forEach((cookie) => {
+    const [key, value] = cookie.split("=");
+    if (key.trim() === "authToken") {
       token = value;
     }
   });
@@ -23,28 +23,25 @@ export default function Navbar() {
   useEffect(() => {
     const tokenFromCookies = getAuthToken();
     setToken(tokenFromCookies);
-  }, []); 
+  }, []);
 
-  const { data, loading, error } = useQuery(ME_QUERY, {
+  const { data, error, loading } = useQuery(ME_QUERY, {
     fetchPolicy: "network-only",
-    skip: !token, 
+    skip: !token,
   });
 
   const handleLogout = () => {
     document.cookie = "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    window.location.href = "/"; 
+    window.location.href = "/";
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    if (error.message === 'Authorization header missing') {
-      return <div>Please log in to access this content.</div>;
+  useEffect(() => {
+    if (error && error.message.includes("Token")) {
+      handleLogout();
     }
-    return <div>Error: {error.message}</div>;
-  }
+  }, [error]);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <nav>

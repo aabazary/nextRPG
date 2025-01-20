@@ -39,22 +39,36 @@ const resolvers = {
         throw new Error('Error fetching characters');
       }
     },
-    me: async (_, __, { authHeader }) => {
-      try {
-        if (!authHeader) {
-          throw new Error('Authorization header missing');
-        }
+    // me: async (_, __, { authHeader }) => {
+    //   try {
+    //     if (!authHeader) {
+    //       throw new Error('Authorization header missing');
+    //     }
     
-        const token = authHeader.replace('Bearer ', '');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.userId).populate('characters');
-        if (!user) throw new Error('User not found');
+    //     const token = authHeader.replace('Bearer ', '');
+    //     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    //     const user = await User.findById(decoded.userId).populate('characters');
+    //     if (!user) throw new Error('User not found');
     
-        return user;
-      } catch (error) {
-        throw new Error(`Authentication error: ${error.message}`);
+    //     return user;
+    //   } catch (error) {
+    //     throw new Error(`Authentication error: ${error.message}`);
+    //   }
+    // },
+    me: async (_, __, context) => {
+      if (!context.user) {
+        throw new Error('Authorization header missing');
       }
+
+      const user = await User.findById(context.user.userId).populate('characters activeCharacter');
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      return user;
     },
+  
     
   },
 
@@ -162,8 +176,7 @@ const resolvers = {
       if (!context.user) {
         throw new Error('Authentication required');
       }
-    
-      const user = await User.findById(context.user._id).populate('characters');
+      const user = await User.findById(context.user.userId).populate('characters');
       if (!user) {
         throw new Error('User not found');
       }

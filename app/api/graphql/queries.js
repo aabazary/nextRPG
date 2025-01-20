@@ -6,8 +6,16 @@ export const ME_QUERY = gql`
     id
     username
     email
+    activeCharacter {
+      id
+      name
+      class
+    }
     characters {
       id
+      name
+      level
+      class
     }
   }
   }
