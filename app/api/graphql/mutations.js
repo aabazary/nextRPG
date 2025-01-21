@@ -47,3 +47,9 @@ export const SET_ACTIVE_CHARACTER_MUTATION= gql`
     email
   }
 }`
+
+export const COMPLETE_GATHER_TASK_MUTATION = gql`
+mutation CompleteGatheringTask($characterId: ID!, $tier: Int!, $successful: Boolean!) {
+  completeGatheringTask(characterId: $characterId, tier: $tier, successful: $successful)
+}
+`

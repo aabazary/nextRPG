@@ -14,6 +14,7 @@ function GameDashboard() {
   const { data, loading, refetch } = useQuery(ME_QUERY, {
     fetchPolicy: "network-only",
   });
+  console.log("🚀 ~ GameDashboard ~ data:", data)
   const [createCharacter] = useMutation(CREATE_CHARACTER_MUTATION);
   const [setActiveCharacter] = useMutation(SET_ACTIVE_CHARACTER_MUTATION);
   const [deleteCharacter] = useMutation(DELETE_CHARACTER_MUTATION);
