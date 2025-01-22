@@ -65,3 +65,9 @@ mutation UsePotion($characterId: ID!, $tier: Int!) {
   usePotion(characterId: $characterId, tier: $tier)
 }
 `
+
+export const COMPLETE_BOSS_TASK_MUTATION =gql`
+mutation CompleteBossBattle($characterId: ID!, $tier: Int!, $successful: Boolean!) {
+  completeBossBattle(characterId: $characterId, tier: $tier, successful: $successful)
+}
+`
