@@ -73,7 +73,7 @@ const typeDefs = `#graphql
     completeGatheringTask(characterId: ID!, tier: Int!, successful: Boolean!): String!
     completeMobBattle(characterId: ID!, tier: Int!, successful: Boolean!): String!
     completeBossBattle(characterId: ID!, tier: Int!, successful: Boolean!): String!
-    purchasePotion(characterId: ID!, tier: Int!): String!
+    purchasePotion(characterId: ID!, tier: Int!, quantity:Int!): String!
     usePotion(characterId: ID!, tier: Int!): String!
     upgradeGear(characterId: ID!, gearType: String!, tier: Int!): String!
     setActiveCharacter(characterId:ID!):User

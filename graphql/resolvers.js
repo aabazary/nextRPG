@@ -270,24 +270,47 @@ const resolvers = {
     ,
     
 
-    purchasePotion: async (_, { characterId, tier }) => {
+    // purchasePotion: async (_, { characterId, tier }) => {
+    //   try {
+    //     const character = await Character.findById(characterId);
+    //     if (!character) throw new Error('Character not found');
+    
+    //     const potionPrice = tier * 50;
+    
+    //     if (character.gold < potionPrice) {
+    //       return "Not enough gold to purchase potion";
+    //     }
+    
+    //     character.gold -= potionPrice;
+    //     character.potionBag[`tier${tier}`] += 1;
+    
+    //     character.markModified('potionBag');
+    //     await character.save();
+    
+    //     return `Potion purchased successfully! Tier ${tier} potion added to potion bag.`;
+    //   } catch (error) {
+    //     throw new Error(`Error purchasing potion: ${error.message}`);
+    //   }
+    // },
+    
+    purchasePotion: async (_, { characterId, tier, quantity }) => {
       try {
         const character = await Character.findById(characterId);
         if (!character) throw new Error('Character not found');
     
-        const potionPrice = tier * 50;
+        const potionPrice = tier * 50 * quantity;
     
         if (character.gold < potionPrice) {
-          return "Not enough gold to purchase potion";
+          return `Not enough gold to purchase ${quantity} Tier ${tier} potion(s)`;
         }
     
         character.gold -= potionPrice;
-        character.potionBag[`tier${tier}`] += 1;
+        character.potionBag[`tier${tier}`] += quantity;
     
         character.markModified('potionBag');
         await character.save();
     
-        return `Potion purchased successfully! Tier ${tier} potion added to potion bag.`;
+        return `Purchase successful! Added ${quantity} Tier ${tier} potion(s) to potion bag.`;
       } catch (error) {
         throw new Error(`Error purchasing potion: ${error.message}`);
       }

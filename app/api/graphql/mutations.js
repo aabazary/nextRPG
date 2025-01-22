@@ -71,3 +71,9 @@ mutation CompleteBossBattle($characterId: ID!, $tier: Int!, $successful: Boolean
   completeBossBattle(characterId: $characterId, tier: $tier, successful: $successful)
 }
 `
+
+export const PURCHASE_POTION_MUTATION = gql`
+mutation PurchasePotion($characterId: ID!, $tier: Int!, $quantity: Int!) {
+  purchasePotion(characterId: $characterId, tier: $tier, quantity: $quantity)
+}
+`
