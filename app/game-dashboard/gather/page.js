@@ -127,7 +127,7 @@ function GatherPage() {
   
   const handleButtonClick = (index) => {
     if (index === gameState.activeButton && gameState.buttonActivated) {
-      handleGameEnd(true); // Success, end the game
+      handleGameEnd(true); 
     } else {
       console.log("Incorrect button clicked!");
       handleGameEnd(false); 

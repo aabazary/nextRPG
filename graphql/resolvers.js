@@ -39,22 +39,7 @@ const resolvers = {
         throw new Error('Error fetching characters');
       }
     },
-    // me: async (_, __, { authHeader }) => {
-    //   try {
-    //     if (!authHeader) {
-    //       throw new Error('Authorization header missing');
-    //     }
-    
-    //     const token = authHeader.replace('Bearer ', '');
-    //     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    //     const user = await User.findById(decoded.userId).populate('characters');
-    //     if (!user) throw new Error('User not found');
-    
-    //     return user;
-    //   } catch (error) {
-    //     throw new Error(`Authentication error: ${error.message}`);
-    //   }
-    // },
+
     me: async (_, __, context) => {
       if (!context.user) {
         throw new Error('Authorization header missing');
@@ -308,6 +293,28 @@ const resolvers = {
       }
     },
     
+    usePotion: async (_, { characterId, tier }) => {
+      try {
+        const character = await Character.findById(characterId);
+        if (!character) throw new Error("Character not found");
+    
+        const potionKey = `tier${tier}`;
+    
+        if (!character.potionBag[potionKey] || character.potionBag[potionKey] <= 0) {
+          return `No Tier ${tier} potions available to use.`;
+        }
+    
+        character.potionBag[potionKey] -= 1;
+    
+        character.markModified("potionBag");
+        await character.save();
+    
+        return `Potion used successfully! Tier ${tier} potion has been consumed.`;
+      } catch (error) {
+        throw new Error(`Error using potion: ${error.message}`);
+      }
+    },
+    
 
     upgradeGear: async (_, { characterId, gearType, tier }) => {
       try {
@@ -320,21 +327,20 @@ const resolvers = {
         
         const resourceAKey = `Tier${tier}ResourceA`;
         const resourceBKey = `Tier${tier}ResourceB`;
-        const resourceCKey = tier > 1 ? `Tier${tier - 1}ResourceC` : null;
+        const resourceCKey = `Tier${tier}ResourceC`;
     
         if (
           character.inventory[resourceAKey] < 20 ||
           character.inventory[resourceBKey] < 20 ||
-          (resourceCKey && character.inventory[resourceCKey] < 20)
+          character.inventory[resourceCKey] < 20
         ) {
           return "Not enough resources to upgrade gear";
         }
 
         character.inventory[resourceAKey] -= 20;
         character.inventory[resourceBKey] -= 20;
-        if (resourceCKey) {
-          character.inventory[resourceCKey] -= 20;
-        }
+        character.inventory[resourceCKey] -= 20;
+     
     
         character.markModified('inventory');
     

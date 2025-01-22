@@ -53,3 +53,15 @@ mutation CompleteGatheringTask($characterId: ID!, $tier: Int!, $successful: Bool
   completeGatheringTask(characterId: $characterId, tier: $tier, successful: $successful)
 }
 `
+
+export const COMPLETE_MOB_TASK_MUTATION = gql`
+mutation CompleteMobBattle($characterId: ID!, $tier: Int!, $successful: Boolean!) {
+  completeMobBattle(characterId: $characterId, tier: $tier, successful: $successful)
+}
+`
+
+export const USE_POTION_MUTATION = gql`
+mutation UsePotion($characterId: ID!, $tier: Int!) {
+  usePotion(characterId: $characterId, tier: $tier)
+}
+`

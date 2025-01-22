@@ -3,7 +3,6 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import dbConnect from '../../../utils/dbConnect';
 import typeDefs from '../../../graphql/typeDefs';
 import resolvers from '../../../graphql/resolvers';
-import { createContext } from '@/utils/auth';
 import jwt from 'jsonwebtoken';
 
 
@@ -19,16 +18,16 @@ const handler = startServerAndCreateNextHandler(server, {
 
     const authHeader = req.headers.get('authorization') || null;
     if (!authHeader) {
-      return { user: null }; // Ensure no user in the context if no token
+      return { user: null }; 
     }
 
     const token = authHeader.replace('Bearer ', '');
     try {
       const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
-      return { user: decodedUser }; // Populate user in context
+      return { user: decodedUser }; 
     } catch (error) {
       console.error('Token verification failed:', error.message);
-      return { user: null }; // Token invalid or expired
+      return { user: null }; 
     }
   },
 });
