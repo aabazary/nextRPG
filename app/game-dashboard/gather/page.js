@@ -20,7 +20,8 @@ function GatherPage() {
     gameTier: null,
     gridSize: 0,
   });
-
+  console.log("🚀 ~ GatherPage ~ gameState:", gameState)
+  
   const countdownRef = useRef(null);
   const gameRef = useRef(null);
   const buttonTimeoutRef = useRef(null);

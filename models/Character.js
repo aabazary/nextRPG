@@ -75,14 +75,10 @@ characterSchema.virtual('castingResource').get(function () {
 
 characterSchema.virtual('preparedness').get(function () {
   const tiers = Object.values(this.armor);
-  const uniqueTiers = [...new Set(tiers)];
-  
-  if (uniqueTiers.length === 1 && uniqueTiers[0] > 0) {
-    return uniqueTiers[0] * 10;
-  }
-  
-  return 0;
+  const lowestTier = Math.min(...tiers);
+  return lowestTier * 10;
 });
+
 
 characterSchema.virtual('power').get(function () {
   return this.level + this.preparedness;

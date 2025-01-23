@@ -57,12 +57,30 @@ const typeDefs = `#graphql
     user: User!
   }
 
+  type ClassDistribution {
+  warriors: Int!
+  mages: Int!
+  hunters: Int!
+}
+
+type UserScore {
+  username: String!
+  totalScore: Int!
+}
+
   type Query {
     getUser(id: ID!): User
     getCharacter(id: ID!): Character
     getAllUsers: [User]
     getAllCharacters: [Character]
     me:User
+    topByExperience: [Character!]!
+    topByScore: [Character!]!
+    topByMobsKilled: [Character!]!
+    topByQuestsCompleted: [Character!]!
+    topByGathering: [Character!]!
+    topUsersByScore: [UserScore!]!
+    classDistribution: ClassDistribution!
   }
 
   type Mutation {

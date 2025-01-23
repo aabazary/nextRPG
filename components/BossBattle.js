@@ -127,7 +127,7 @@ const BossBattle = ({ character, boss, onClose }) => {
         let action = "";
         const randomValue = Math.random();
         if (boss.preparedness > character.preparedness) {
-          damage = Math.round(boss.power * 4);
+          damage = Math.round(boss.power * 40);
           action = "ultimate attack";
         } else if (randomValue > 0.5) {
           damage = Math.round(boss.power * (Math.random() * (2 - 1) + 1));

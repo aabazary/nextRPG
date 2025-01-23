@@ -54,7 +54,87 @@ const resolvers = {
       return user;
     },
   
+    topByExperience: async () => {
+      try {
+        const characters = await Character.find()
+          .sort({ experience: -1 }) 
+          .limit(5); 
+        return characters;
+      } catch (error) {
+        throw new Error(`Error fetching top characters by experience: ${error.message}`);
+      }
+    },
+    topByScore: async () => {
+      try {
+        const characters = await Character.find()
+          .sort({ score: -1 }) 
+          .limit(5);
+        return characters;
+      } catch (error) {
+        throw new Error(`Error fetching top characters by score: ${error.message}`);
+      }
+    },
+    topByMobsKilled: async () => {
+      try {
+        const characters = await Character.find()
+          .sort({ "progress.mobsKilled": -1 })
+          .limit(5);
+        return characters;
+      } catch (error) {
+        throw new Error(`Error fetching top characters by mobs killed: ${error.message}`);
+      }
+    },
+    topByQuestsCompleted: async () => {
+      try {
+        const characters = await Character.find()
+          .sort({ "progress.questsCompleted": -1 }) 
+          .limit(5);
+        return characters;
+      } catch (error) {
+        throw new Error(`Error fetching top characters by quests completed: ${error.message}`);
+      }
+    },
+    topByGathering: async () => {
+      try {
+        const characters = await Character.find()
+          .sort({ "progress.gatherings": -1 })
+          .limit(5);
+        return characters;
+      } catch (error) {
+        throw new Error(`Error fetching top characters by gathering: ${error.message}`);
+      }
+    },
+    topUsersByScore: async () => {
+      try {
+        const users = await User.find(); 
+        const userScores = await Promise.all(
+          users.map(async (user) => {
+            const characters = await Character.find({ _id: { $in: user.characters } });
     
+            const totalScore = characters.reduce((sum, char) => sum + (char.score || 0), 0);
+    
+            return { username: user.username, totalScore };
+          })
+        );
+        return userScores.sort((a, b) => b.totalScore - a.totalScore).slice(0, 5);
+      } catch (error) {
+        throw new Error(`Error fetching top users by combined score: ${error.message}`);
+      }
+    },
+    
+    classDistribution: async () => {
+      try {
+        const warriors = await Character.countDocuments({ class: 'Warrior' });
+        const mages = await Character.countDocuments({ class: 'Mage' });
+        const hunters = await Character.countDocuments({ class: 'Hunter' });
+    
+        return { warriors, mages, hunters };
+      } catch (error) {
+        throw new Error(`Error fetching class distribution: ${error.message}`);
+      }
+    },
+    
+  
   },
 
   Mutation: {
@@ -269,29 +349,6 @@ const resolvers = {
     }
     ,
     
-
-    // purchasePotion: async (_, { characterId, tier }) => {
-    //   try {
-    //     const character = await Character.findById(characterId);
-    //     if (!character) throw new Error('Character not found');
-    
-    //     const potionPrice = tier * 50;
-    
-    //     if (character.gold < potionPrice) {
-    //       return "Not enough gold to purchase potion";
-    //     }
-    
-    //     character.gold -= potionPrice;
-    //     character.potionBag[`tier${tier}`] += 1;
-    
-    //     character.markModified('potionBag');
-    //     await character.save();
-    
-    //     return `Potion purchased successfully! Tier ${tier} potion added to potion bag.`;
-    //   } catch (error) {
-    //     throw new Error(`Error purchasing potion: ${error.message}`);
-    //   }
-    // },
     
     purchasePotion: async (_, { characterId, tier, quantity }) => {
       try {

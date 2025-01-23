@@ -77,3 +77,9 @@ mutation PurchasePotion($characterId: ID!, $tier: Int!, $quantity: Int!) {
   purchasePotion(characterId: $characterId, tier: $tier, quantity: $quantity)
 }
 `
+
+export const UPGRADE_GEAR_MUTATION =gql`
+mutation UpgradeGear($characterId: ID!, $gearType: String!, $tier: Int!) {
+  upgradeGear(characterId: $characterId, gearType: $gearType, tier: $tier)
+}
+`

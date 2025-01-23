@@ -50,6 +50,73 @@ query Me {
         tier10
       }
     }
+  },
+}`;
+
+export const TOP_CHARACTERS_EXPERIENCE= gql`
+query TopByExperience {
+  topByExperience {
+    id
+    name
+    experience
   }
-}
-`;
+}`;
+
+export const TOP_CHARACTERS_SCORE= gql`
+query TopByScore {
+  topByScore {
+    id
+    name
+    score
+  }
+}`;
+
+export const TOP_CHARACTERS_MOBS_KILLED= gql`
+query TopByMobsKilled {
+  topByMobsKilled {
+    id
+    name
+    progress {
+      mobsKilled
+    }
+  }
+}`;
+
+export const TOP_CHARACTERS_QUESTS_COMPLETED= gql`
+query TopByQuestsCompleted {
+  topByQuestsCompleted {
+    id
+    name
+    progress {
+      questsCompleted
+    }
+  }
+}`;
+
+export const TOP_CHARACTERS_GATHERING= gql`
+query TopByGathering {
+  topByGathering {
+    id
+    name
+    progress {
+      gatherings
+    }
+  }
+}`;
+
+export const TOP_USERS_SCORE= gql`
+query TopUsersByScore {
+  topUsersByScore {
+    username
+    totalScore
+  }
+}`;
+
+export const CLASS_DISTRIBUTION= gql`
+query ClassDistribution {
+  classDistribution {
+    warriors
+    mages
+    hunters
+  }
+}`;
