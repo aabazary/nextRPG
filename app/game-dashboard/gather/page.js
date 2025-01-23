@@ -90,42 +90,42 @@ function GatherPage() {
   };
   
   const startGameLogic = (buttonDelay) => {
+  const gameStartTime = Date.now(); 
+  const totalGameTime = 5000; 
+
+  buttonTimeoutRef.current = setTimeout(() => {
+    const randomButton = Math.floor(Math.random() * (gameState.gridSize * gameState.gridSize));
     setGameState((prevState) => ({
       ...prevState,
-      gameTimer: 5, 
+      activeButton: randomButton,
+      buttonActivated: true,
     }));
-  
 
-    buttonTimeoutRef.current = setTimeout(() => {
-      const randomButton = Math.floor(Math.random() * (gameState.gridSize * gameState.gridSize));
+    setTimeout(() => {
       setGameState((prevState) => ({
         ...prevState,
-        activeButton: randomButton,
-        buttonActivated: true,
+        activeButton: null,
+        buttonActivated: false,
       }));
-  
-      setTimeout(() => {
-        setGameState((prevState) => ({
-          ...prevState,
-          activeButton: null,
-          buttonActivated: false,
-        }));
-      }, 800); 
-    }, buttonDelay * 1000); 
-  
-    if (gameRef.current) clearInterval(gameRef.current);
-    
-    gameRef.current = setInterval(() => {
-      setGameState((prevState) => {
-        if (prevState.gameTimer <= 1) {
-          clearInterval(gameRef.current);
-          if (!prevState.success) handleGameEnd(false); 
-        }
-        return { ...prevState, gameTimer: Math.max(prevState.gameTimer - 0.1, 0) }; 
-      });
-    }, 100);
-  };
-  
+    }, 800); 
+  }, buttonDelay * 1000); 
+
+  if (gameRef.current) clearInterval(gameRef.current);
+
+  gameRef.current = setInterval(() => {
+    const elapsedTime = Date.now() - gameStartTime;
+    const remainingTime = Math.max((totalGameTime - elapsedTime) / 1000, 0);
+
+    setGameState((prevState) => {
+      if (remainingTime <= 0) {
+        clearInterval(gameRef.current);
+        if (!prevState.success) handleGameEnd(false); 
+      }
+      return { ...prevState, gameTimer: remainingTime }; 
+    });
+  }, 100);
+};
+
   const handleButtonClick = (index) => {
     if (index === gameState.activeButton && gameState.buttonActivated) {
       handleGameEnd(true); 
@@ -215,7 +215,7 @@ function GatherPage() {
                   {Array.from({ length: gameState.gridSize * gameState.gridSize }).map((_, index) => (
                     <button
                       key={index}
-                      onClick={() => handleButtonClick(index)}
+                      onMouseDown={() => handleButtonClick(index)}
                       className={`w-16 h-16 ${index === gameState.activeButton ? "bg-green-500" : "bg-gray-300"} rounded`}
                     >
                       {index === gameState.activeButton ? "Click Me!" : ""}

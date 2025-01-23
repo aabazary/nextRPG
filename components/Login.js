@@ -12,7 +12,8 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await login({ variables: { email, password } });
+      const sanitizedEmail=email.toLowerCase()
+      const { data } = await login({ variables: { email:sanitizedEmail, password } });
       document.cookie = `authToken=${data.login.token}; path=/`;
       alert("Login successful!");
       window.location.href = "/game-dashboard";

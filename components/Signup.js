@@ -13,7 +13,8 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await signup({ variables: { username, email, password } });
+      const sanitizedEmail = email.toLowerCase();
+      const { data } = await signup({ variables: { username, email:sanitizedEmail, password } });
       document.cookie = `authToken=${data.signup.token}; path=/`;
       alert("Signup successful!");
       window.location.href = "/";

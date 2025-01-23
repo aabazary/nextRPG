@@ -144,7 +144,9 @@ const resolvers = {
         if (existingUser) throw new Error('User already exists');
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ email,username, password: hashedPassword });
+
+        const sanitizedEmail=email.toLowerCase()
+        const newUser = new User({ email:sanitizedEmail,username, password: hashedPassword });
         await newUser.save();
 
         const token =  jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
@@ -158,7 +160,8 @@ const resolvers = {
 
     login: async (_, { email, password }) => {
       try {
-        const user = await User.findOne({ email });
+        const sanitizedEmail=email.toLowerCase()
+        const user = await User.findOne({ email:sanitizedEmail });
         if (!user) throw new Error('User not found');
 
         const isMatch = await bcrypt.compare(password, user.password);
