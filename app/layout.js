@@ -9,6 +9,9 @@ import Footer from "@/components/Footer";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <title>Next RPG</title>
+      </head>
        <body className="bg-gray-100 text-gray-900 flex flex-col min-h-screen">
         <ApolloProvider client={client}>
           <Navbar />
