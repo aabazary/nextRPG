@@ -11,23 +11,25 @@ import {
 import withAuth from "@/app/api/graphql/withAuth";
 
 function GameDashboard() {
-  const { data, loading, refetch } = useQuery(ME_QUERY, {
-    fetchPolicy: "network-only",
+  const { data, loading, refetch } = useQuery(ME_QUERY, { fetchPolicy: "network-only" });
+  const [createCharacter] = useMutation(CREATE_CHARACTER_MUTATION, {
+    onCompleted: () => refetch(),
   });
-
-  const [createCharacter] = useMutation(CREATE_CHARACTER_MUTATION);
-  const [setActiveCharacter] = useMutation(SET_ACTIVE_CHARACTER_MUTATION);
-  const [deleteCharacter] = useMutation(DELETE_CHARACTER_MUTATION);
+  const [setActiveCharacter] = useMutation(SET_ACTIVE_CHARACTER_MUTATION, {
+    onCompleted: () => refetch(),
+  });
+  const [deleteCharacter] = useMutation(DELETE_CHARACTER_MUTATION, {
+    onCompleted: () => refetch(),
+  });
 
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [newCharacterName, setNewCharacterName] = useState("");
   const [newCharacterClass, setNewCharacterClass] = useState("Warrior");
-  const [expandedCharacterId, setExpandedCharacterId] = useState(null);
   const [characterToDelete, setCharacterToDelete] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="text-primary">Loading...</p>;
 
   const handleCreateCharacter = async () => {
     if (!newCharacterName) {
@@ -43,21 +45,11 @@ function GameDashboard() {
           class: newCharacterClass,
         },
       });
-      await refetch();
       setModalOpen(false);
       setNewCharacterName("");
       setNewCharacterClass("Warrior");
     } catch (err) {
       console.error("Error creating character:", err);
-    }
-  };
-
-  const handleSelectCharacter = async (characterId) => {
-    try {
-      await setActiveCharacter({ variables: { characterId } });
-      await refetch();
-    } catch (err) {
-      console.error("Error setting active character:", err);
     }
   };
 
@@ -69,7 +61,6 @@ function GameDashboard() {
 
     try {
       await deleteCharacter({ variables: { characterId: characterToDelete.id } });
-      await refetch();
       setDeleteModalOpen(false);
       setCharacterToDelete(null);
       setDeleteConfirmation("");
@@ -78,113 +69,104 @@ function GameDashboard() {
     }
   };
 
-  const toggleCharacterDetails = (characterId) => {
-    setExpandedCharacterId(expandedCharacterId === characterId ? null : characterId);
-  };
-
   const activeCharacter = data?.me?.activeCharacter;
 
   return (
     <div>
-      <h1>Game Dashboard</h1>
-
-      {/* Current Active Character Section */}
-      <div>
-        <h2>Current Active Character</h2>
+       <h1 className="text-2xl font-bold mb-4">Gathering Page</h1>
+      {/* Banner for Active Character */}
+      <section className="mb-6 bg-primary text-textLight p-4 rounded shadow">
+        <h2 className="text-xl font-bold mb-2">Current Active Character</h2>
         {activeCharacter ? (
-          <p>
+          <p className="text-lg font-medium">
             {activeCharacter.name} ({activeCharacter.class})
           </p>
         ) : (
-          <p>None</p>
+          <p className="text-secondary">No active character selected.</p>
         )}
-      </div>
+      </section>
 
-      {/* Characters List */}
-      <div>
-        <h2>Your Characters</h2>
-        {data?.me?.characters.map((char) => (
-          <div key={char.id}>
-            <p
-              className="cursor-pointer text-blue-500 underline"
-              onClick={() => toggleCharacterDetails(char.id)}
-            >
-              {char.name} ({char.class})
-            </p>
-            {expandedCharacterId === char.id && (
-              <div className="ml-4">
-                <p>Class: {char.class}</p>
-                <p>Level: {char.level}</p>
-                <div className="flex gap-2 mt-2">
-                  <button
-                    className="px-2 py-1 bg-blue-500 text-white rounded"
-                    onClick={() => handleSelectCharacter(char.id)}
-                  >
-                    Set Active
-                  </button>
-                  <button
-                    className="px-2 py-1 bg-red-500 text-white rounded"
-                    onClick={() => {
-                      setCharacterToDelete(char);
-                      setDeleteModalOpen(true);
-                    }}
-                  >
-                    Delete Character
-                  </button>
-                </div>
+      {/* Character Cards */}
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-4 text-secondary">Your Characters</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {data?.me?.characters.map((char) => (
+            <div key={char.id} className="bg-primaryLight p-4 rounded shadow">
+              <h3 className="text-lg font-bold mb-2 text-secondary">
+                {char.name} ({char.class})
+              </h3>
+              <p className="text-sm text-secondary mb-4">Level: {char.level}</p>
+              <div className="flex gap-4">
+                <button
+                  className="px-4 py-2 bg-secondary text-textLight rounded hover:bg-primary transition"
+                  onClick={() => setActiveCharacter({ variables: { characterId: char.id } })}
+                >
+                  Set Active
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-500 text-textLight rounded hover:bg-red-600 transition"
+                  onClick={() => {
+                    setCharacterToDelete(char);
+                    setDeleteModalOpen(true);
+                  }}
+                >
+                  Delete
+                </button>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* Create Character Button */}
+      {/* Button to Create a New Character */}
       <button
-        className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
+        className="px-6 py-3 bg-secondary text-textLight rounded hover:bg-primary transition"
         onClick={() => setModalOpen(true)}
       >
         Create New Character
       </button>
 
-      {/* Modal for Creating a Character */}
+      {/* Create Character Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <h2>Create New Character</h2>
-            <div>
-              <label>
-                Character Name:
-                <input
-                  type="text"
-                  value={newCharacterName}
-                  onChange={(e) => setNewCharacterName(e.target.value)}
-                  className="border px-2 py-1 ml-2"
-                />
-              </label>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md relative">
+            <button
+              className="absolute top-3 right-3 text-textLight hover:text-gray-200"
+              onClick={() => setModalOpen(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-secondary">Create New Character</h2>
+            <div className="mb-4">
+              <label className="block text-secondary mb-2">Character Name</label>
+              <input
+                type="text"
+                value={newCharacterName}
+                onChange={(e) => setNewCharacterName(e.target.value)}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-primaryHover"
+              />
             </div>
-            <div className="mt-4">
-              <label>
-                Character Class:
-                <select
-                  value={newCharacterClass}
-                  onChange={(e) => setNewCharacterClass(e.target.value)}
-                  className="border px-2 py-1 ml-2"
-                >
-                  <option value="Warrior">Warrior</option>
-                  <option value="Mage">Mage</option>
-                  <option value="Hunter">Hunter</option>
-                </select>
-              </label>
+            <div className="mb-6">
+              <label className="block text-secondary mb-2">Character Class</label>
+              <select
+                value={newCharacterClass}
+                onChange={(e) => setNewCharacterClass(e.target.value)}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-primaryHover"
+              >
+                <option value="Warrior">Warrior</option>
+                <option value="Mage">Mage</option>
+                <option value="Hunter">Hunter</option>
+              </select>
             </div>
-            <div className="mt-4 flex gap-2">
+            <div className="flex justify-end gap-4">
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className="px-4 py-2 bg-secondary text-textLight rounded hover:bg-primary transition"
                 onClick={handleCreateCharacter}
               >
                 Create
               </button>
               <button
-                className="px-4 py-2 bg-gray-500 text-white rounded"
+                className="px-4 py-2 bg-gray-500 text-textLight rounded hover:bg-gray-600 transition"
                 onClick={() => setModalOpen(false)}
               >
                 Cancel
@@ -194,36 +176,37 @@ function GameDashboard() {
         </div>
       )}
 
-      {/* Modal for Deleting a Character */}
+      {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <h2>Confirm Delete</h2>
-            <p>
-              Are you sure you want to delete the character{" "}
-              <strong>{characterToDelete?.name}</strong>? This action cannot be
-              undone.
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md relative">
+            <button
+              className="absolute top-3 right-3 text-textLight hover:text-gray-200"
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-secondary">Confirm Delete</h2>
+            <p className="text-secondary mb-4">
+              Are you sure you want to delete <strong>{characterToDelete?.name}</strong>? This action
+              cannot be undone.
             </p>
-            <div className="mt-4">
-              <label>
-                Type <strong>{characterToDelete?.name}</strong> to confirm:
-                <input
-                  type="text"
-                  value={deleteConfirmation}
-                  onChange={(e) => setDeleteConfirmation(e.target.value)}
-                  className="border px-2 py-1 ml-2"
-                />
-              </label>
-            </div>
-            <div className="mt-4 flex gap-2">
+            <input
+              type="text"
+              value={deleteConfirmation}
+              onChange={(e) => setDeleteConfirmation(e.target.value)}
+              placeholder={`Type "${characterToDelete?.name}" to confirm`}
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-primaryHover mb-4"
+            />
+            <div className="flex justify-end gap-4">
               <button
-                className="px-4 py-2 bg-red-500 text-white rounded"
+                className="px-4 py-2 bg-red-500 text-textLight rounded hover:bg-red-600 transition"
                 onClick={handleDeleteCharacter}
               >
                 Delete
               </button>
               <button
-                className="px-4 py-2 bg-gray-500 text-white rounded"
+                className="px-4 py-2 bg-gray-500 text-textLight rounded hover:bg-gray-600 transition"
                 onClick={() => {
                   setDeleteModalOpen(false);
                   setDeleteConfirmation("");

@@ -6,7 +6,9 @@ import { ME_QUERY } from "@/app/api/graphql/queries";
 import { PURCHASE_POTION_MUTATION } from "@/app/api/graphql/mutations";
 
 const Shop = () => {
-  const { data, loading, refetch } = useQuery(ME_QUERY, { fetchPolicy: "network-only" });
+  const { data, loading, refetch } = useQuery(ME_QUERY, {
+    fetchPolicy: "network-only",
+  });
   const [selectedTier, setSelectedTier] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -26,7 +28,9 @@ const Shop = () => {
       .map(([_, value]) => value);
 
     for (let i = 0; i <= 10; i++) {
-      const allArmorAboveTier = armorValues.every((armorValue) => armorValue >= i);
+      const allArmorAboveTier = armorValues.every(
+        (armorValue) => armorValue >= i
+      );
 
       if (allArmorAboveTier) {
         availableTiers.push(i + 1);
@@ -65,33 +69,45 @@ const Shop = () => {
         </div>
       )}
 
-      <div className="mb-4">
-        <p>Gold: {activeCharacter.gold}</p>
-        <h3 className="text-lg font-semibold">Potion Inventory:</h3>
-        <ul>
-          {Object.entries(activeCharacter.potionBag || {})
-            .filter(([key, count]) => key !== "__typename" && count > 0)
-            .map(([tier, count]) => (
-              <li key={tier}>
-                {tier}: {count}
-              </li>
-            ))}
-        </ul>
-      </div>
+      <div className="flex justify-between items-start">
+        <div className="mb-4">
+          <div className="mb-2 p-4 bg-primary rounded shadow-md mr-5">
+            <p className="text-yellow-400 text-2xl font-semibold">
+              Gold: {activeCharacter.gold}
+            </p>
+          </div>
 
-      <div className="flex flex-wrap gap-4 mb-6">
-        {availableTiers.map((tier) => (
-          <button
-            key={tier}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            onClick={() => {
-              setSelectedTier(tier);
-              toggleModal();
-            }}
-          >
-            Tier {tier} Potion - {50 * tier} Gold
-          </button>
-        ))}
+          <div className="flex flex-wrap gap-4 mb-6">
+            {availableTiers.map((tier) => (
+              <button
+                key={tier}
+                className="px-4 py-2 bg-secondary text-white rounded hover:bg-primary"
+                onClick={() => {
+                  setSelectedTier(tier);
+                  toggleModal();
+                }}
+              >
+                Tier {tier} Potion - {50 * tier} Gold
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="border rounded p-4 bg-gray-100 shadow-md w-1/4">
+          <h3 className="text-lg font-semibold mb-2">Potion Inventory:</h3>
+          <ul>
+            {Object.entries(activeCharacter.potionBag || {})
+              .filter(([key, count]) => key !== "__typename" && count > 0)
+              .map(([tier, count]) => {
+                const formattedTier = tier.replace(/tier(\d+)/i, "Tier $1");
+                return (
+                  <li key={tier}>
+                    {formattedTier}: {count}
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
       </div>
 
       {isModalOpen && (

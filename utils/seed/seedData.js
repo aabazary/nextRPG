@@ -17,7 +17,6 @@ const seedData = async () => {
       {
         name: 'Thalador',
         class: 'Warrior',
-        inventory: { sword: 1, shield: 1 },
         gold: 100,
         armor: {
           helmet: 1,
@@ -49,7 +48,6 @@ const seedData = async () => {
       {
         name: 'Elariel',
         class: 'Mage',
-        inventory: { staff: 1, book: 1 },
         gold: 50,
         armor: {
           helmet: 0,
@@ -81,7 +79,6 @@ const seedData = async () => {
       {
         name: 'Kaelron',
         class: 'Hunter',
-        inventory: { bow: 1, arrows: 20 },
         gold: 75,
         armor: {
           helmet: 2,

@@ -92,17 +92,17 @@ const MobBattle = ({ character, mob, onClose }) => {
       const timer = setTimeout(() => {
         let damage = 0;
         let action = "";
-        let randomValue= Math.random()
+        let randomValue = Math.random();
         if (mob.preparedness > character.preparedness) {
           damage = Math.round(mob.power * 40000);
           action = "ultimate attack";
-        } else if (randomValue>0.5) {
+        } else if (randomValue > 0.5) {
           damage = Math.round(mob.power * (Math.random() * (2 - 1) + 1));
           action = mob.skill2;
         } else {
           damage = Math.round(mob.power);
           action = "normal attack";
-        } 
+        }
 
         setCharacterHealth((prev) => Math.max(prev - damage, 0));
         addLog(`Mob used ${action} and dealt ${damage} damage.`, false);
@@ -145,6 +145,7 @@ const MobBattle = ({ character, mob, onClose }) => {
     });
     refetch();
     setShowPotionBag(false);
+    setTurn("mob");
   };
 
   const handleReplay = () => {
@@ -159,21 +160,86 @@ const MobBattle = ({ character, mob, onClose }) => {
 
   return (
     <div>
-      <div className="character-stats mb-4">
-        <h6 className="text-lg font-bold">Character</h6>
-        <p>
-          Health: {characterHealth}/{character.maxHealth}
-        </p>
-        <p>
-          Resource: {characterResource}/{character.maxResource}
-        </p>
-        <p>Turn: {turn === "character" ? "Your Turn" : "Mob's Turn"}</p>
+      <div className="flex justify-between items-center mb-4">
+        {/* Character Health and Resource */}
+        <div className="flex flex-col items-start">
+          <h6 className="font-bold mb-2">Character</h6>
+          {/* Health Bar */}
+          <div className="flex flex-row">
+            <div className="relative w-48 h-6 bg-gray-700 border border-gray-500 rounded mb-2 mr-2">
+              <div
+                className={`absolute left-0 top-0 h-full rounded transition-all duration-300`}
+                style={{
+                  width: `${(characterHealth / character.maxHealth) * 100}%`,
+                  backgroundColor:
+                    characterHealth / character.maxHealth >= 0.7
+                      ? "green"
+                      : characterHealth / character.maxHealth >= 0.45
+                      ? "orange"
+                      : characterHealth / character.maxHealth >= 0.21
+                      ? "yellow"
+                      : "red",
+                  paddingBottom: "1px", 
+                }}
+              ></div>
+            </div>
+
+            <span className="order-last ">
+              {characterHealth}/{character.maxHealth}
+            </span>
+          </div>
+
+          {/* Resource Bar */}
+          <div className="flex flex-row">
+            <div className="relative w-48 h-4 bg-gray-700 border border-gray-500 rounded mr-2">
+              <div
+                className="absolute left-0 top-0 h-4 bg-blue-500 rounded"
+                style={{
+                  width: `${
+                    (characterResource / character.maxResource) * 100
+                  }%`,
+                }}
+              ></div>
+            </div>
+            <span className="order-last ">
+              {characterResource}/{character.maxResource}
+            </span>
+          </div>
+        </div>
+
+        {/* Mob Health */}
+        <div className="flex flex-col items-end">
+          <h6 className="font-bold mb-2 -mt-5 mr-2">Mob</h6>
+          <div className="flex flex-row">
+          <div className="relative w-48 h-6 bg-gray-700 border border-gray-500 rounded mb-2 mr-2">
+              <div
+                className={`absolute left-0 top-0 h-full rounded transition-all duration-300`}
+                style={{
+                  width: `${(mobHealth / mob.maxHealth) * 100}%`,
+                  backgroundColor:
+                    characterHealth / character.maxHealth >= 0.7
+                      ? "green"
+                      : characterHealth / character.maxHealth >= 0.45
+                      ? "orange"
+                      : characterHealth / character.maxHealth >= 0.21
+                      ? "yellow"
+                      : "red",
+                  paddingBottom: "1px", 
+                }}
+              ></div>
+            </div>
+
+            <span className="order-first ">
+              {mobHealth}/{mob.maxHealth}
+            </span>
+          </div>
+        </div>
       </div>
+
       <hr />
-      <div className="mob-stats mb-4">
-        <h6 className="text-lg font-bold">Mob</h6>
-        <p>
-          Health: {mobHealth}/{mob.maxHealth}
+      <div className="mb-4 flex justify-center">
+        <p className="mt-4 text-lg">
+          {turn === "character" ? "Your Turn" : "Mob's Turn"}
         </p>
       </div>
       {!isBattleOver ? (
@@ -181,7 +247,7 @@ const MobBattle = ({ character, mob, onClose }) => {
           <div>
             <h6 className="text-lg font-bold">Actions</h6>
             {turn === "character" && (
-              <div className="actions">
+              <div className="actions flex justify-center">
                 <button
                   className="px-4 py-2 bg-green-600 text-white rounded mr-2"
                   onClick={() => handleAttack("normal")}
@@ -213,26 +279,27 @@ const MobBattle = ({ character, mob, onClose }) => {
               </div>
             )}
           </div>
-{showPotionBag && (
-  <div className="potion-bag mt-4">
-    <h6 className="text-lg font-bold">Potion Bag</h6>
-    {Object.entries(data?.me?.activeCharacter?.potionBag || {})
-      .filter(([key, count]) => key !== "__typename" && count > 0)
-      .map(([tier, count]) => (
-        <button
-          key={tier}
-          className="px-4 py-2 bg-orange-600 text-white rounded mr-2 mt-2"
-          onClick={() => handleUsePotion(tier)}
-        >
-          Tier {parseInt(tier.slice(4))} Potion ({count})
-        </button>
-      ))}
-    {Object.entries(data?.me?.activeCharacter?.potionBag || {})
-      .filter(([key]) => key !== "__typename")
-      .every(([_, count]) => count === 0) && <p>No potions available!</p>}
-  </div>
-)}
-
+          {showPotionBag && (
+            <div className="potion-bag mt-4">
+              <h6 className="text-lg font-bold">Potion Bag</h6>
+              {Object.entries(data?.me?.activeCharacter?.potionBag || {})
+                .filter(([key, count]) => key !== "__typename" && count > 0)
+                .map(([tier, count]) => (
+                  <button
+                    key={tier}
+                    className="px-4 py-2 bg-orange-600 text-white rounded mr-2 mt-2"
+                    onClick={() => handleUsePotion(tier)}
+                  >
+                    Tier {parseInt(tier.slice(4))} Potion ({count})
+                  </button>
+                ))}
+              {Object.entries(data?.me?.activeCharacter?.potionBag || {})
+                .filter(([key]) => key !== "__typename")
+                .every(([_, count]) => count === 0) && (
+                <p>No potions available!</p>
+              )}
+            </div>
+          )}
         </>
       ) : (
         <div className="mt-4">

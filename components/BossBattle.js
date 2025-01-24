@@ -197,13 +197,13 @@ const BossBattle = ({ character, boss, onClose }) => {
     <div>
       {showQuestions ? (
         <div>
-          <h6 className="text-lg font-bold">Boss Challenge</h6>
+          <h6 className="text-lg font-bold">Questing</h6>
           <p>{questions[currentQuestionIndex].question}</p>
-          <div>
+          <div className="flex justify-center">
             {questions[currentQuestionIndex].options.map((option, index) => (
               <button
                 key={index}
-                className="px-4 py-2 bg-blue-500 text-white rounded m-2"
+                className="px-4 py-2 bg-secondary text-white hover:bg-primary rounded m-2"
                 onClick={() => handleAnswer(option)}
               >
                 {option}
@@ -213,7 +213,7 @@ const BossBattle = ({ character, boss, onClose }) => {
         </div>
       ) : (
         <div>
-          <div className="character-stats mb-4">
+          {/* <div className="character-stats mb-4">
             <h6 className="text-lg font-bold">Character</h6>
             <p>
               Health: {characterHealth}/{character.maxHealth}
@@ -222,22 +222,102 @@ const BossBattle = ({ character, boss, onClose }) => {
               Resource: {characterResource}/{character.maxResource}
             </p>
             <p>Turn: {turn === "character" ? "Your Turn" : "Boss's Turn"}</p>
+          </div> */}
+                <h2 className="text-xl font-bold mb-4 text-center">
+              Boss: Tier {boss.tier}
+            </h2>
+            <div className="flex justify-between items-center mb-4">
+        {/* Character Health and Resource */}
+        <div className="flex flex-col items-start">
+          <h6 className="font-bold mb-2">Character</h6>
+          {/* Health Bar */}
+          <div className="flex flex-row">
+            <div className="relative w-48 h-6 bg-gray-700 border border-gray-500 rounded mb-2 mr-2">
+              <div
+                className={`absolute left-0 top-0 h-full rounded transition-all duration-300`}
+                style={{
+                  width: `${(characterHealth / character.maxHealth) * 100}%`,
+                  backgroundColor:
+                    characterHealth / character.maxHealth >= 0.7
+                      ? "green"
+                      : characterHealth / character.maxHealth >= 0.45
+                      ? "orange"
+                      : characterHealth / character.maxHealth >= 0.21
+                      ? "yellow"
+                      : "red",
+                  paddingBottom: "1px", 
+                }}
+              ></div>
+            </div>
+
+            <span className="order-last ">
+              {characterHealth}/{character.maxHealth}
+            </span>
           </div>
+
+          {/* Resource Bar */}
+          <div className="flex flex-row">
+            <div className="relative w-48 h-4 bg-gray-700 border border-gray-500 rounded mr-2">
+              <div
+                className="absolute left-0 top-0 h-4 bg-blue-500 rounded"
+                style={{
+                  width: `${
+                    (characterResource / character.maxResource) * 100
+                  }%`,
+                }}
+              ></div>
+            </div>
+            <span className="order-last ">
+              {characterResource}/{character.maxResource}
+            </span>
+          </div>
+        </div>
+
+        {/* Boss Health */}
+        <div className="flex flex-col items-end">
+          <h6 className="font-bold mb-2 -mt-5 mr-2">Boss</h6>
+          <div className="flex flex-row">
+          <div className="relative w-48 h-6 bg-gray-700 border border-gray-500 rounded mb-2 mr-2">
+              <div
+                className={`absolute left-0 top-0 h-full rounded transition-all duration-300`}
+                style={{
+                  width: `${(bossHealth / boss.maxHealth) * 100}%`,
+                  backgroundColor:
+                    characterHealth / character.maxHealth >= 0.7
+                      ? "green"
+                      : characterHealth / character.maxHealth >= 0.45
+                      ? "orange"
+                      : characterHealth / character.maxHealth >= 0.21
+                      ? "yellow"
+                      : "red",
+                  paddingBottom: "1px", 
+                }}
+              ></div>
+            </div>
+
+            <span className="order-first ">
+              {bossHealth}/{boss.maxHealth}
+            </span>
+          </div>
+        </div>
+      </div>
           <hr />
-          <div className="boss-stats mb-4">
-            <h6 className="text-lg font-bold">Boss</h6>
-            <p>
-              Health: {bossHealth}/{boss.maxHealth}
-            </p>
-          </div>
+          <div className="mb-4 flex justify-center">
+        <p className="mt-4 text-lg">
+          {turn === "character" ? "Your Turn" : "Mob's Turn"}
+        </p>
+      </div>
 
           {isBattleOver ? (
             <div className="mt-4">
-              <h6 className="text-lg font-bold">
+              <h6 className="text-lg font-bold flex justify-center">
                 {bossHealth === 0
                   ? "Victory!"
-                  : "Game Over! You answered incorrectly."}
+                  : "You Lose!"}
               </h6>
+              <div className="flex justify-center">
+
+              
               <button
                 className="px-4 py-2 bg-gray-600 text-white rounded mr-2"
                 onClick={onClose}
@@ -245,11 +325,12 @@ const BossBattle = ({ character, boss, onClose }) => {
                 Return to Quest
               </button>
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded"
+                className="px-4 py-2 bg-green-600 text-white rounded"
                 onClick={handleReplay}
               >
                 Replay
               </button>
+              </div>
             </div>
           ) : showQuestions ? (
             <div>
@@ -274,7 +355,7 @@ const BossBattle = ({ character, boss, onClose }) => {
               <div>
                 <h6 className="text-lg font-bold">Actions</h6>
                 {turn === "character" && (
-                  <div className="actions">
+                  <div className="actions flex justify-center">
                     <button
                       className="px-4 py-2 bg-green-600 text-white rounded mr-2"
                       onClick={() => handleAttack("normal")}
@@ -330,19 +411,24 @@ const BossBattle = ({ character, boss, onClose }) => {
             </>
           )}
 
-          <div
-            ref={logContainerRef}
-            className="battle-log mt-4 bg-gray-200 p-4 rounded h-40 overflow-y-auto"
-          >
-            <h6 className="text-lg font-bold mb-2">Battle Log</h6>
-            {logs.map((log, index) => (
-              <p
-                key={index}
-                className={log.isCharacter ? "text-green-700" : "text-red-700"}
-              >
-                {log.message}
-              </p>
-            ))}
+          <div className="mt-4">
+            <h6 className="text-lg font-bold">Battle Logs</h6>
+            <div
+              ref={logContainerRef}
+              className="h-32 overflow-y-auto border rounded p-2 bg-gray-100"
+              style={{ maxHeight: "200px" }}
+            >
+              {logs.map((log, index) => (
+                <p
+                  key={index}
+                  className={
+                    log.isCharacter ? "text-green-600" : "text-red-600"
+                  }
+                >
+                  {log.message}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
       )}

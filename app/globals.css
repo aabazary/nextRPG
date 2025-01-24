@@ -6,6 +6,56 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+body {
+  @apply bg-accent text-textDark font-sans;
+}
+
+a {
+  @apply cursor-pointer underline hover:text-accent;
+}
+
+button {
+  @apply cursor-pointer transition duration-300 ease-in-out;
+}
+
+h1, h2, h3, h4 {
+  @apply font-bold;
+}
+
+.modal-container {
+  max-width: 400px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-button {
+  background-color: #4a90e2;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.modal-button:hover {
+  background-color: #357ab8;
+}
+
 
 @media (prefers-color-scheme: dark) {
   :root {

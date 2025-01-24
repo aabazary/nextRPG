@@ -52,49 +52,48 @@ const Upgrade = () => {
     }
   };
 
+  const customSort = (a, b) => {
+    const isTierA = a.startsWith("Tier");
+    const isTierB = b.startsWith("Tier");
+
+    if (isTierA && isTierB) {
+      const numA = parseInt(a.replace("Tier", ""), 10);
+      const numB = parseInt(b.replace("Tier", ""), 10);
+      return numA - numB;
+    }
+
+    return a.localeCompare(b);
+  };
+
   const sortedInventory = Object.keys(activeCharacter.inventory)
-  .filter((key) => activeCharacter.inventory[key] > 0)
-  .sort((a, b) => a.localeCompare(b)) // Alphabetical sorting
-  .map((key) => ({
-    name: key,
-    quantity: activeCharacter.inventory[key],
-  }));
+    .filter((key) => activeCharacter.inventory[key] > 0)
+    .sort(customSort)
+    .map((key) => ({
+      name: key,
+      quantity: activeCharacter.inventory[key],
+    }));
 
-  console.log(sortedInventory)
+  const formatKey = (key) =>
+    key
+      .replace(/([A-Z])/g, " $1") // Add spaces before capital letters
+      .replace(/^./, (str) => str.toUpperCase()) // Capitalize the first letter
+      .replace("ChestPiece", "Chest Piece"); // Special case for chestPiece
+
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Upgrade Gear</h2>
-
-      {upgradeMessage && (
-        <div className="mb-4 p-4 bg-green-200 text-green-800 rounded">
-          {upgradeMessage}
-        </div>
-      )}
-
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold">Inventory:</h3>
-        <ul>
-        {sortedInventory.map((item) => (
-            <li key={item.name}>
-              {item.name}: {item.quantity}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold">Current Gear:</h3>
-        <ul>
+    <div className="p-6 flex flex-col md:flex-row gap-6">
+      <div className="flex-1">
+        <h3 className="text-lg font-semibold mb-4">Current Gear:</h3>
+        <ul className="bg-gray-100 border rounded p-4">
           {Object.entries(activeCharacter.armor || {})
             .filter(([key]) => key !== "__typename")
             .map(([gearType, tier]) => (
-              <li key={gearType} className="flex items-center justify-between">
+              <li key={gearType} className="flex items-center justify-between mb-2">
                 <span>
-                  {gearType}: Tier {tier}
+                  {formatKey(gearType)}: Tier {tier}
                 </span>
                 {canUpgrade(gearType, tier + 1) ? (
                   <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-4 py-2 bg-secondary text-white rounded hover:bg-primary"
                     onClick={() => {
                       setSelectedGear({ gearType, targetTier: tier + 1 });
                       setConfirmModal(true);
@@ -115,11 +114,24 @@ const Upgrade = () => {
         </ul>
       </div>
 
+      <div className="flex-1">
+        <h3 className="text-lg font-semibold mb-4">Inventory:</h3>
+        <div className="bg-gray-100 border rounded p-4">
+          <ul>
+            {sortedInventory.map((item) => (
+              <li key={item.name} className="mb-2">
+                {formatKey(item.name)}: {item.quantity}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
       {confirmModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-3/4 max-w-md p-6">
             <h3 className="text-xl font-bold mb-4">
-              Confirm Upgrade: {selectedGear.gearType} to Tier {selectedGear.targetTier}
+              Confirm Upgrade: {formatKey(selectedGear.gearType)} to Tier {selectedGear.targetTier}
             </h3>
             <p>Are you sure you want to upgrade this gear?</p>
             <div className="flex justify-end gap-4 mt-4">

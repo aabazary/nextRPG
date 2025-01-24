@@ -20,8 +20,7 @@ function GatherPage() {
     gameTier: null,
     gridSize: 0,
   });
-  console.log("🚀 ~ GatherPage ~ gameState:", gameState)
-  
+
   const countdownRef = useRef(null);
   const gameRef = useRef(null);
   const buttonTimeoutRef = useRef(null);
@@ -45,8 +44,8 @@ function GatherPage() {
   const availableTiers = [];
   if (activeCharacter?.armor) {
     const armorValues = Object.entries(activeCharacter.armor)
-      .filter(([key, value]) => key !== "__typename")
-      .map(([key, value]) => value);
+      .filter(([key]) => key !== "__typename")
+      .map(([, value]) => value);
 
     for (let i = 0; i <= 10; i++) {
       const allArmorAboveTier = armorValues.every((armorValue) => armorValue >= i);
@@ -58,21 +57,22 @@ function GatherPage() {
       }
     }
   }
+
   const startMiniGame = (tier) => {
     if (!tier) return;
-  
+
     clearTimers();
-  
-    const gameTime = 5; 
-    const buttonDelay = Math.random() * 4.2; 
-  
+
+    const gameTime = 5;
+    const buttonDelay = Math.random() * 4.2;
+
     setGameState((prevState) => ({
       ...prevState,
       gameTier: tier,
       gridSize: Math.sqrt(tier * tier),
       miniGameActive: true,
-      countdown: 3, 
-      gameTimer: gameTime, 
+      countdown: 3,
+      gameTimer: gameTime,
       success: null,
       activeButton: null,
       buttonActivated: false,
@@ -82,62 +82,62 @@ function GatherPage() {
       setGameState((prevState) => {
         if (prevState.countdown === 1) {
           clearInterval(countdownRef.current);
-          startGameLogic(buttonDelay); 
+          startGameLogic(buttonDelay);
         }
         return { ...prevState, countdown: prevState.countdown - 1 };
       });
     }, 1000);
   };
-  
+
   const startGameLogic = (buttonDelay) => {
-  const gameStartTime = Date.now(); 
-  const totalGameTime = 5000; 
+    const gameStartTime = Date.now();
+    const totalGameTime = 5000;
 
-  buttonTimeoutRef.current = setTimeout(() => {
-    const randomButton = Math.floor(Math.random() * (gameState.gridSize * gameState.gridSize));
-    setGameState((prevState) => ({
-      ...prevState,
-      activeButton: randomButton,
-      buttonActivated: true,
-    }));
-
-    setTimeout(() => {
+    buttonTimeoutRef.current = setTimeout(() => {
+      const randomButton = Math.floor(Math.random() * (gameState.gridSize * gameState.gridSize));
       setGameState((prevState) => ({
         ...prevState,
-        activeButton: null,
-        buttonActivated: false,
+        activeButton: randomButton,
+        buttonActivated: true,
       }));
-    }, 800); 
-  }, buttonDelay * 1000); 
 
-  if (gameRef.current) clearInterval(gameRef.current);
+      setTimeout(() => {
+        setGameState((prevState) => ({
+          ...prevState,
+          activeButton: null,
+          buttonActivated: false,
+        }));
+      }, 800);
+    }, buttonDelay * 1000);
 
-  gameRef.current = setInterval(() => {
-    const elapsedTime = Date.now() - gameStartTime;
-    const remainingTime = Math.max((totalGameTime - elapsedTime) / 1000, 0);
+    if (gameRef.current) clearInterval(gameRef.current);
 
-    setGameState((prevState) => {
-      if (remainingTime <= 0) {
-        clearInterval(gameRef.current);
-        if (!prevState.success) handleGameEnd(false); 
-      }
-      return { ...prevState, gameTimer: remainingTime }; 
-    });
-  }, 100);
-};
+    gameRef.current = setInterval(() => {
+      const elapsedTime = Date.now() - gameStartTime;
+      const remainingTime = Math.max((totalGameTime - elapsedTime) / 1000, 0);
+
+      setGameState((prevState) => {
+        if (remainingTime <= 0) {
+          clearInterval(gameRef.current);
+          if (!prevState.success) handleGameEnd(false);
+        }
+        return { ...prevState, gameTimer: remainingTime };
+      });
+    }, 100);
+  };
 
   const handleButtonClick = (index) => {
     if (index === gameState.activeButton && gameState.buttonActivated) {
-      handleGameEnd(true); 
+      handleGameEnd(true);
     } else {
       console.log("Incorrect button clicked!");
-      handleGameEnd(false); 
+      handleGameEnd(false);
     }
   };
-  
+
   const handleGameEnd = (wasSuccessful) => {
     if (gameState.success !== null) return;
-  
+
     clearTimers();
     setGameState((prevState) => ({
       ...prevState,
@@ -157,11 +157,10 @@ function GatherPage() {
       showTryAgainModal();
     }
   };
-  
+
   const showTryAgainModal = () => {
     console.log("Try again!");
   };
-  
 
   const handleCloseModal = () => {
     clearTimers();
@@ -184,16 +183,18 @@ function GatherPage() {
 
   return (
     <div>
-      <h1>Gathering Page</h1>
+      <h1 className="text-2xl font-bold mb-4">Gathering Page</h1>
 
       <div>
-        <h2>Available Gathering Tiers</h2>
+        <h2>Available Tiers</h2>
         {availableTiers.map((tier) => (
           <button
             key={tier}
-            className={`px-4 py-2 bg-blue-500 text-white rounded m-2 ${!availableTiers.includes(tier) ? 'bg-gray-500 cursor-not-allowed' : ''}`}
+            className={`px-4 py-2 bg-secondary text-white hover:bg-primary rounded m-2 ${
+              !availableTiers.includes(tier) ? "bg-gray-500 cursor-not-allowed" : ""
+            }`}
             onClick={() => startMiniGame(tier)}
-            disabled={!availableTiers.includes(tier)} 
+            disabled={!availableTiers.includes(tier)}
           >
             Tier {tier} Gathering
           </button>
@@ -209,14 +210,18 @@ function GatherPage() {
               <div>
                 <h2>Click the Correct Button!</h2>
                 <div
-                  className={`grid grid-cols-${gameState.gridSize} gap-2`}
+                  className={`grid`}
                   style={{ display: "grid", gridTemplateColumns: `repeat(${gameState.gridSize}, 1fr)` }}
                 >
                   {Array.from({ length: gameState.gridSize * gameState.gridSize }).map((_, index) => (
                     <button
                       key={index}
                       onMouseDown={() => handleButtonClick(index)}
-                      className={`w-16 h-16 ${index === gameState.activeButton ? "bg-green-500" : "bg-gray-300"} rounded`}
+                      className={`w-16 h-16 m-1 ${
+                        index === gameState.activeButton
+                          ? "bg-green-500"
+                          : "bg-gray-300"
+                      } rounded`}
                     >
                       {index === gameState.activeButton ? "Click Me!" : ""}
                     </button>
@@ -239,13 +244,13 @@ function GatherPage() {
             )}
             <div className="mt-4 flex gap-2">
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className="px-4 py-2 bg-secondary hover:bg-primary text-white rounded"
                 onClick={() => startMiniGame(gameState.gameTier)}
               >
                 Replay
               </button>
               <button
-                className="px-4 py-2 bg-gray-500 text-white rounded"
+                className="px-4 py-2  bg-gray-500 text-white rounded hover:bg-gray-600"
                 onClick={handleBackToGathering}
               >
                 Back to Gathering Page

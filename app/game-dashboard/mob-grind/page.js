@@ -3,7 +3,18 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { ME_QUERY } from "@/app/api/graphql/queries";
 import MobBattle from "@/components/MobBattle";
-import { Tier1Mob, Tier2Mob, Tier3Mob, Tier4Mob, Tier5Mob, Tier6Mob, Tier7Mob, Tier8Mob, Tier9Mob, Tier10Mob } from "@/models/enemies/Mob";
+import {
+  Tier1Mob,
+  Tier2Mob,
+  Tier3Mob,
+  Tier4Mob,
+  Tier5Mob,
+  Tier6Mob,
+  Tier7Mob,
+  Tier8Mob,
+  Tier9Mob,
+  Tier10Mob,
+} from "@/models/enemies/Mob";
 
 const getMob = (tier) => {
   switch (tier) {
@@ -62,7 +73,6 @@ const MobGrind = () => {
   }
 
   const mob = selectedTier ? getMob(selectedTier) : null;
-  console.log("🚀 ~ MobGrind ~ mob:", mob)
 
   return (
     <div className="p-6">
@@ -72,7 +82,7 @@ const MobGrind = () => {
         {availableTiers.map((tier) => (
           <button
             key={tier}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-secondary text-white rounded hover:bg-primary focus:ring-2 focus:ring-green-500"
             onClick={() => {
               setSelectedTier(tier);
               toggleModal();
@@ -84,8 +94,22 @@ const MobGrind = () => {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-3/4 max-w-md p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-gray-800 text-white rounded-lg shadow-lg p-6 w-4/5 max-w-2xl relative border-2 border-gray-600">
+            {/* Flee Button */}
+            <button
+              className="absolute top-4 right-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              onClick={toggleModal}
+            >
+              Flee
+            </button>
+
+            {/* Battle Title */}
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Battle: Tier {selectedTier}
+            </h2>
+
+            {/* Mob Battle Component */}
             <MobBattle
               character={{
                 ...activeCharacter,
@@ -95,7 +119,7 @@ const MobGrind = () => {
               mob={{
                 tier: mob?.tier,
                 health: mob?.health,
-                maxHealth:mob?.health,
+                maxHealth: mob?.health,
                 castingResource: mob?.castingResource,
                 skill2: mob?.skill2(),
                 power: mob?.power,

@@ -13,19 +13,16 @@ import {
   CLASS_DISTRIBUTION,
 } from "@/app/api/graphql/queries";
 ChartJS.register(ArcElement, Tooltip, Legend);
+
 const HighScores = () => {
-  // Fetch all the data for the tables and pie chart
   const { data: experienceData } = useQuery(TOP_CHARACTERS_EXPERIENCE);
   const { data: scoreData } = useQuery(TOP_CHARACTERS_SCORE);
   const { data: mobsKilledData } = useQuery(TOP_CHARACTERS_MOBS_KILLED);
-  const { data: questsCompletedData } = useQuery(
-    TOP_CHARACTERS_QUESTS_COMPLETED
-  );
+  const { data: questsCompletedData } = useQuery(TOP_CHARACTERS_QUESTS_COMPLETED);
   const { data: gatheringData } = useQuery(TOP_CHARACTERS_GATHERING);
   const { data: usersScoreData } = useQuery(TOP_USERS_SCORE);
   const { data: classDistributionData } = useQuery(CLASS_DISTRIBUTION);
 
-  // Format data for the pie chart
   const pieChartData = classDistributionData
     ? {
         labels: ["Warriors", "Mages", "Hunters"],
@@ -37,7 +34,6 @@ const HighScores = () => {
               classDistributionData.classDistribution.hunters,
             ],
             backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-            hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
           },
         ],
       }
@@ -75,20 +71,23 @@ const HighScores = () => {
     totalScore: user.totalScore,
   }));
 
-  const renderTable = (data) => {
-    return (
-      <table>
+  const renderTable = (data, title) => (
+    <div className="p-4 bg-white rounded shadow-md">
+      <h2 className="text-lg font-semibold mb-2">{title}</h2>
+      <table className="min-w-full text-left text-sm border-collapse border border-gray-300">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Value</th>
+          <tr className="bg-gray-200">
+            <th className="border border-gray-300 px-4 py-2">Name</th>
+            <th className="border border-gray-300 px-4 py-2">Value</th>
           </tr>
         </thead>
         <tbody>
-          {data?.map((item) => (
-            <tr key={item.name || item.username}>
-              <td>{item.name || item.username}</td>
-              <td>
+          {data?.map((item, index) => (
+            <tr key={index} className="odd:bg-gray-50 even:bg-white">
+              <td className="border border-gray-300 px-4 py-2">
+                {item.name || item.username}
+              </td>
+              <td className="border border-gray-300 px-4 py-2">
                 {item.experience ||
                   item.score ||
                   item.mobsKilled ||
@@ -101,43 +100,47 @@ const HighScores = () => {
           ))}
         </tbody>
       </table>
-    );
-  };
+    </div>
+  );
 
   return (
-    <div className="high-score-page">
-      <h1>High Scores</h1>
-      <div className="tables">
-        <div className="table"><h2>Top Experience</h2>{renderTable(mappedExperience)}</div>
-        <div className="table"><h2>Top Score</h2>{renderTable(mappedScore)}</div>
-        <div className="table"><h2>Top Quests Completed</h2>{renderTable(mappedQuestsCompleted)}</div>
-        <div className="table"><h2>Top Mobs Killed</h2>{renderTable(mappedMobsKilled)}</div>
-        <div className="table"><h2>Top Gatherers</h2>{renderTable(mappedGathering)}</div>
-        <div className="table"><h2>Top User Total Score</h2>{renderTable(mappedCumulativeScore)}</div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold text-center mb-6">High Scores</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {renderTable(mappedExperience, "Top Experience")}
+        {renderTable(mappedScore, "Top Score")}
+        {renderTable(mappedQuestsCompleted, "Top Quests Completed")}
+        {renderTable(mappedMobsKilled, "Top Mobs Killed")}
+        {renderTable(mappedGathering, "Top Gatherers")}
+        {renderTable(mappedCumulativeScore, "Top User Total Score")}
       </div>
-      <div className="chart">
-        <h3>Class Distribution</h3>
+      <div className="mt-8 p-4 bg-white rounded shadow-md text-center">
+        <h3 className="text-lg font-semibold mb-4">Class Distribution</h3>
         {pieChartData ? (
-          <Pie
-            data={pieChartData}
-            options={{
-              plugins: {
-                tooltip: {
-                  callbacks: {
-                    label: (tooltipItem) => {
-                      const value = tooltipItem.raw;
-                      const total =
-                        classDistributionData.classDistribution.warriors +
-                        classDistributionData.classDistribution.mages +
-                        classDistributionData.classDistribution.hunters;
-                      const percentage = ((value / total) * 100).toFixed(2);
-                      return `${value} (${percentage}%)`;
+          <div className="flex justify-center">
+            <div className="w-64 h-64">
+              <Pie
+                data={pieChartData}
+                options={{
+                  plugins: {
+                    tooltip: {
+                      callbacks: {
+                        label: (tooltipItem) => {
+                          const value = tooltipItem.raw;
+                          const total =
+                            classDistributionData.classDistribution.warriors +
+                            classDistributionData.classDistribution.mages +
+                            classDistributionData.classDistribution.hunters;
+                          const percentage = ((value / total) * 100).toFixed(2);
+                          return `${value} (${percentage}%)`;
+                        },
+                      },
                     },
                   },
-                },
-              },
-            }}
-          />
+                }}
+              />
+            </div>
+          </div>
         ) : (
           <p>Loading chart...</p>
         )}
