@@ -2,9 +2,11 @@ import User from "../../models/User.js"
 import Character from "../../models/Character.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import "dotenv/config.js";
 
 const seedData = async () => {
-  await mongoose.connect('mongodb://127.0.0.1:27017/rpg-game', {
+  await mongoose.connect(process.env.MONGODB_URI ,{
+    dbName:"rpg-game",
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });

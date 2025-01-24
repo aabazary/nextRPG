@@ -53,7 +53,7 @@ characterSchema.virtual('level').get(function () {
 
 characterSchema.virtual('health').get(function () {
   const baseHealth = 10;
-  const armorMultiplier = [0, 20, 100, 500];
+  const armorMultiplier = [0, 20, 100, 200,400,800,1200,2000,4000,6500,10000];
   const classMultiplier = {
     Mage: 1,
     Hunter: 1.5,
@@ -61,9 +61,9 @@ characterSchema.virtual('health').get(function () {
   };
 
   const levelContribution = (this.level - 1) * 10;
-  const armorContribution = Object.values(this.armor).reduce((total, tier) => {
-    return total + (armorMultiplier[tier] || 0);
-  }, 0);
+  const tiers = Object.values(this.armor);
+  const lowestTier = Math.min(...tiers);
+  const armorContribution = armorMultiplier[lowestTier]
 
   const classMultiplierValue = classMultiplier[this.class] || 1;
   return (baseHealth + armorContribution + levelContribution) * classMultiplierValue;
