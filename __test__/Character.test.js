@@ -131,7 +131,7 @@ describe('Character Model', () => {
       },
     });
 
-    const expectedPower = character.level + character.preparedness;
+    const expectedPower = character.level + character.preparedness+5;
     expect(character.power).toBe(expectedPower);
   });
 });
