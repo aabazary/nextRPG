@@ -13,7 +13,7 @@ describe('Character Model', () => {
         mongoServer = await MongoMemoryServer.create();
         const uri = mongoServer.getUri();
       
-        await mongoose.connect(uri); // No need for options here
+        await mongoose.connect(uri); 
       });
       
       afterAll(async () => {

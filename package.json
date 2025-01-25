@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "node utils/seed/seedData.js",
-    "test": "jest --detectOpenHandles "
+    "test": "jest --verbose"
   },
   "dependencies": {
     "@apollo/client": "^3.12.6",
