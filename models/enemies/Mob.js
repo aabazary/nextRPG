@@ -9,7 +9,7 @@ class Mob {
     this.#health = 50 + tier * 10;
     this.#castingResource = 20 + tier * 5;
     this.#power = 10 + tier * 3;
-    this.#preparedness = 5 + tier * 2;
+    this.#preparedness =(tier-1) * 10-1;
   }
  // Getters
  get tier() {
@@ -41,6 +41,13 @@ set health(value) {
   }
 }
 
+set power(value) {
+  if (value >= 0) {
+    this.#power = value;
+  } else {
+    console.warn("Power cannot be negative.");
+  }
+}
 // Methods
 skill1() {
   return `${this.constructor.name} uses Skill1!`;
@@ -58,7 +65,8 @@ skill3() {
 class Tier1Mob extends Mob {
   constructor() {
     super(1);
-    this.health += 5;
+    this.health = 20;
+    this.power=5
   }
 
   skill1() {

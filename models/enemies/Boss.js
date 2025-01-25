@@ -6,10 +6,10 @@ class Boss {
     #preparedness;
     constructor(tier) {
       this.#tier = tier;
-      this.#health = 50 + tier * 10;
+      this.#health = 15;
       this.#castingResource = 20 + tier * 5;
       this.#power = 10 + tier * 3;
-      this.#preparedness = 5 + tier * 2;
+      this.#preparedness = (tier-1) * 10-1;
     }
    // Getters
    get tier() {
@@ -38,6 +38,13 @@ class Boss {
       this.#health = value;
     } else {
       console.warn("Health cannot be negative.");
+    }
+  }
+  set power(value) {
+    if (value >= 0) {
+      this.#power = value;
+    } else {
+      console.warn("Power cannot be negative.");
     }
   }
   
@@ -76,7 +83,8 @@ class Boss {
   class Tier1Boss extends Boss {
     constructor() {
       super(1);
-      this.health += 5;
+      this.health = 25;
+      this.power=6
     }
   
     skill1() {

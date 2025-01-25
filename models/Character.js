@@ -81,7 +81,7 @@ characterSchema.virtual('preparedness').get(function () {
 
 
 characterSchema.virtual('power').get(function () {
-  return this.level + this.preparedness;
+  return this.level + this.preparedness+5;
 });
 
 
